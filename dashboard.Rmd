@@ -1,0 +1,138 @@
+---
+title: "Financial Dashboard"
+output: 
+  flexdashboard::flex_dashboard:
+    oriention: rows
+    vertical_layout: fill
+    source_code: embed
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+# load packages
+library(tidyverse)
+library(magrittr)
+library(flexdashboard)
+library(rmarkdown)
+library(rsconnect)
+library(rlist)
+library(plotly)
+library(janitor)
+library(readxl)
+library(devtools)
+
+commodity <- readRDS("data/commodity.rds")
+currency <- readRDS("data/currency.rds")
+index <- readRDS("data/index.rds")
+etf <- readRDS("data/etf.rds")
+```
+
+Global Index
+=======================================================================
+Column {.sidebar}
+-----------------------------------------------------------------------
+
+```{r}
+selectInput(inputId = 'index_name', 
+            label = 'Select Index', 
+            choices = names(index) %>% tail(-1),
+            selected = names(index)[[2]]
+            )
+selectInput(inputId = 'etf_name', 
+            label = 'Select ETF', 
+            choices = names(etf),
+            selected = names(etf)[[1]]
+            )
+selectInput(inputId = 'currency_name', 
+            label = 'Select Currency', 
+            choices = names(currency),
+            selected = names(currency)[[1]]
+            )
+selectInput(inputId = 'commodity_name', 
+            label = 'Select Commodity', 
+            choices = names(commodity),
+            selected = names(commodity)[[1]]
+            )
+```
+
+Row
+-----------------------------------------------------------------------
+
+### Index
+
+```{r}
+# Combine the selected variables into a new data frame
+select_index <- reactive({
+  index[[input$index_name]]
+})
+
+renderPlotly({
+  p <- 
+    select_index() %>% 
+    ggplot(aes(x = date, y = last_price)) +
+    # geom_point() +
+    geom_line() +
+    labs(x = "Date", y = "Price")
+  ggplotly(p)
+})
+```
+
+### ETF
+
+```{r}
+# Combine the selected variables into a new data frame
+select_etf <- reactive({
+  etf[[input$etf_name]]
+})
+
+renderPlotly({
+  p <- 
+    select_etf() %>% 
+    ggplot(aes(x = date, y = last_price)) +
+    # geom_point() +
+    geom_line() +
+    labs(x = "Date", y = "Price")
+  ggplotly(p)
+})
+```
+
+Row
+-----------------------------------------------------------------------
+
+### Currency
+
+```{r}
+# Combine the selected variables into a new data frame
+select_currency <- reactive({
+  currency[[input$currency_name]]
+})
+
+renderPlotly({
+  p <- 
+    select_currency() %>% 
+    ggplot(aes(x = date, y = last_price)) +
+    # geom_point() +
+    geom_line() +
+    labs(x = "Date", y = "Price")
+  ggplotly(p)
+})
+```
+
+### Commodity
+
+```{r}
+# Combine the selected variables into a new data frame
+select_commodity <- reactive({
+  commodity[[input$commodity_name]]
+})
+
+renderPlotly({
+  p <- 
+    select_commodity() %>% 
+    ggplot(aes(x = date, y = last_price)) +
+    # geom_point() +
+    geom_line() +
+    labs(x = "Date", y = "Price")
+  ggplotly(p)
+})
+```
